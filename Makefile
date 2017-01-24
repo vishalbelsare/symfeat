@@ -6,4 +6,4 @@ init:
 	pip install -e .
 
 dev: init
-	pip install py.test
+	pip install pytest
