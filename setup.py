@@ -20,6 +20,8 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 required = [
+    "numpy",
+    "scikit-learn"
 ]
 
 setup(

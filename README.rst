@@ -24,3 +24,15 @@ Installation
 
 Usage
 -----
+
+.. code-block:: python
+
+    import numpy as np
+    import symfeat as sf
+
+    operators = {"sin": np.sin}
+    exponents = [1, 2, -1, -2]
+
+    x = np.random.normal(size=10)
+
+    features = sf.SymbolicFeatures(exponents=exponents, operators=operators).transform(x)
