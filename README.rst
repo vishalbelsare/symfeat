@@ -5,6 +5,8 @@ symfeat
     :target: https://travis-ci.org/Ohjeah/symfeat
 .. image:: https://badge.fury.io/py/symfeat.svg
     :target: https://badge.fury.io/py/symfeat
+.. image:: https://zenodo.org/badge/79949716.svg
+    :target: https://zenodo.org/badge/latestdoi/79949716
 
 **symfeat** is a rule based feature engineering library to be used as a
 preprocessor for regression tasks.
