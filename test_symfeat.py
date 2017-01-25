@@ -64,7 +64,7 @@ def test_SymbolicFeatures(data):
     exponents = [2]
 
     sym = sf.SymbolicFeatures(exponents, operators)
-    features = sym.transform(data)
+    features = sym.fit_transform(data)
 
     names = sym.names
 

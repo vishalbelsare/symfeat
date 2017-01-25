@@ -21,7 +21,6 @@ if sys.argv[-1] == "publish":
 
 required = [
     "numpy",
-    "scikit-learn"
 ]
 
 setup(

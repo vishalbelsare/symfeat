@@ -1,10 +1,13 @@
 from itertools import product, chain, combinations
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 
-class Base(BaseEstimator, TransformerMixin):
-    pass
+class Base(object):
+    def fit(self, x):
+        return self
+
+    def fit_transform(self, x):
+        return self.fit(x).transform(x)
 
 
 class ConstantFeature(Base):
@@ -69,6 +72,9 @@ def _allfinite(tpl):
 def _take_finite(x):
     return list(filter(_allfinite, x))
 
+def _hash(array):
+    return hash(str(array))
+
 
 class SymbolicFeatures(Base):
     """Main class.
@@ -76,8 +82,9 @@ class SymbolicFeatures(Base):
     def __init__(self, exponents, operators):
         self.exponents = exponents
         self.operators = operators
+        self._precompute_hash = None
 
-    def transform(self, x):
+    def fit(self, x):
         _, n_features = x.shape
         # 0) Get constant feature
         const = [(ConstantFeature(), ConstantFeature().transform(x))]
@@ -93,7 +100,18 @@ class SymbolicFeatures(Base):
         prod = _take_finite((p, p.transform(x)) for p in prod)
 
         all_ = const + simple + operator + prod
-        names, features = zip(*[(c.name, np.array(f)) for c,f in all_])
-        features = np.array(list(features)).T
+        feat_cls, names, features = zip(*[(c, c.name, np.array(f)) for c, f in all_])
+
+        self._precomputed_features = np.array(list(features)).T
+        self._precompute_hash = _hash(x)
+
         self.names = list(names)
-        return features
+        self.feat_cls = list(feat_cls)
+        return self
+
+    def transform(self, x):
+        if self._precompute_hash == _hash(x):
+            return self._precomputed_features
+        else:
+            features = [c.transform(x) for c in self.feat_cls]
+            return np.array(list(features)).T

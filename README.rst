@@ -40,5 +40,5 @@ Usage
     x = np.random.normal(size=10).reshape(-1, 1)
 
     sym = sf.SymbolicFeatures(exponents=exponents, operators=operators)
-    features = sym.transform(x)
+    features = sym.fit_transform(x)
     names = sym.names
