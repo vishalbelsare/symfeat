@@ -3,6 +3,8 @@ symfeat
 
 .. image:: https://travis-ci.org/Ohjeah/symfeat.svg?branch=master
     :target: https://travis-ci.org/Ohjeah/symfeat
+.. image:: https://badge.fury.io/py/symfeat.svg
+    :target: https://badge.fury.io/py/symfeat
 
 **symfeat** is a rule based feature engineering library to be used as a
 preprocessor for regression tasks.
@@ -33,6 +35,8 @@ Usage
     operators = {"sin": np.sin}
     exponents = [1, 2, -1, -2]
 
-    x = np.random.normal(size=10)
+    x = np.random.normal(size=10).reshape(-1, 1)
 
-    features = sf.SymbolicFeatures(exponents=exponents, operators=operators).transform(x)
+    sym = sf.SymbolicFeatures(exponents=exponents, operators=operators)
+    features = sym.transform(x)
+    names = sym.names
