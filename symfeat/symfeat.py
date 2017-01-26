@@ -96,6 +96,7 @@ class SymbolicFeatures(Base):
         self.operators = operators
         self._precompute_hash = None
         self.remove_identities = remove_identities
+        self._names = None
 
     def fit(self, x):
         _, n_features = x.shape
@@ -115,12 +116,11 @@ class SymbolicFeatures(Base):
         all_ = const + simple + operator + prod
         if self.remove_identities:
             all_ = _remove_id(all_)
-        feat_cls, names, features = zip(*[(c, c.name, np.array(f)) for c, f in all_])
+        feat_cls, features = zip(*[(c, np.array(f)) for c, f in all_])
 
         self._precomputed_features = np.array(list(features)).T  # speed up fit_transform
         self._precompute_hash = _hash(x)
 
-        self.names = list(names)
         self.feat_cls = list(feat_cls)
         return self
 
@@ -130,3 +130,12 @@ class SymbolicFeatures(Base):
         else:
             features = [c.transform(x) for c in self.feat_cls]
             return np.array(list(features)).T
+
+    @property
+    def names(self):
+        """Get all the feature names. If sympy is used to remove identical features, use the simplified name instead. Cached!
+        """
+        if self._names is None:
+            attr = "simple_name" if self.remove_identities else "name"
+            self._names = [getattr(f, attr) for f in self.feat_cls]
+        return self._names
