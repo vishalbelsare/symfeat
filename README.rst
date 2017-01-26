@@ -18,6 +18,9 @@ It is based on:
 
 Features
 --------
+- Builds a features based on all valid rule specified combinations
+- Discards non-finite transformations
+- Optional: remove equivalent expressions
 
 
 Installation
