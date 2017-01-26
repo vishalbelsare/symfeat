@@ -5,7 +5,7 @@ import symfeat as sf
 
 @pytest.fixture
 def data():
-    d = np.random.normal(size=(10,2))
+    d = np.random.normal(size=(10, 2))
     d[0, 0] = 0
     return d
 

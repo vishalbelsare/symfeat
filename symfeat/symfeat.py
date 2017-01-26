@@ -6,7 +6,7 @@ from sympy import simplify
 class Base(object):
     def fit(self, x):
         return self
-
+        
     def fit_transform(self, x):
         return self.fit(x).transform(x)
 
