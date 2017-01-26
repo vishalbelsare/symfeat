@@ -71,3 +71,13 @@ def test_SymbolicFeatures(data):
     assert len(names) == features.shape[1]
     assert features.shape[0] == data.shape[0]
     np.testing.assert_allclose(features[:, 0], np.ones_like(data[:,0]))
+
+
+def test_SymbolicFeatures_remove_id(data):
+    """ProductFeature x_i * x_i**2 == x_i**3
+    """
+    operators = {}
+    exponents = [1, 2, 3]
+    sym = sf.SymbolicFeatures(exponents, operators).fit(data)
+    # const + simple * 2 + products - excluded
+    assert len(sym.names) == 1 + 2*3 + 15 - 2

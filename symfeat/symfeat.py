@@ -1,6 +1,7 @@
 from itertools import product, chain, combinations
 
 import numpy as np
+from sympy import simplify
 
 class Base(object):
     def fit(self, x):
@@ -75,14 +76,26 @@ def _take_finite(x):
 def _hash(array):
     return hash(str(array))
 
+def _remove_id(tpl):
+    seen = set()
+    result = []
+    for b, x in tpl:
+        expr = simplify(b.name)
+        b.simple_name = expr
+        if expr not in seen:
+            seen.add(expr)
+            result.append((b, x))
+    return result
+
 
 class SymbolicFeatures(Base):
     """Main class.
     """
-    def __init__(self, exponents, operators):
+    def __init__(self, exponents, operators, remove_identities=True):
         self.exponents = exponents
         self.operators = operators
         self._precompute_hash = None
+        self.remove_identities = remove_identities
 
     def fit(self, x):
         _, n_features = x.shape
@@ -100,9 +113,11 @@ class SymbolicFeatures(Base):
         prod = _take_finite((p, p.transform(x)) for p in prod)
 
         all_ = const + simple + operator + prod
+        if self.remove_identities:
+            all_ = _remove_id(all_)
         feat_cls, names, features = zip(*[(c, c.name, np.array(f)) for c, f in all_])
 
-        self._precomputed_features = np.array(list(features)).T
+        self._precomputed_features = np.array(list(features)).T  # speed up fit_transform
         self._precompute_hash = _hash(x)
 
         self.names = list(names)

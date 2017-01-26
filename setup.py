@@ -21,6 +21,7 @@ if sys.argv[-1] == "publish":
 
 required = [
     "numpy",
+    "sympy",
 ]
 
 setup(
