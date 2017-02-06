@@ -1,14 +1,22 @@
 from itertools import product, chain, combinations
+from collections import OrderedDict
 
 import numpy as np
 from sympy import simplify
+from toolz import compose
+from joblib import hash as _hash
+
 
 class Base(object):
     def fit(self, x):
         return self
-        
+
     def fit_transform(self, x):
         return self.fit(x).transform(x)
+
+    @property
+    def name(self):
+        return str(simplify(self._name))
 
 
 class ConstantFeature(Base):
@@ -33,7 +41,7 @@ class SimpleFeature(Base):
         return x[:, self.index]**self.exponent
 
     @property
-    def name(self):
+    def _name(self):
         if self.exponent == 1:
             return "x_{}".format(self.index)
         else:
@@ -50,7 +58,7 @@ class OperatorFeature(Base):
         return self.operator(self.feat_cls.transform(x))
 
     @property
-    def name(self):
+    def _name(self):
         return "{}({})".format(self.operator_name, self.feat_cls.name)
 
 
@@ -63,12 +71,14 @@ class ProductFeature(Base):
         return self.feat_cls1.transform(x) * self.feat_cls2.transform(x)
 
     @property
-    def name(self):
+    def _name(self):
         return "{}*{}".format(self.feat_cls1.name, self.feat_cls2.name)
+
 
 def _allfinite(tpl):
     b, x = tpl
     return np.all(np.isfinite(x))
+
 
 def _take_finite(x):
     return list(filter(_allfinite, x))
@@ -76,26 +86,37 @@ def _take_finite(x):
 def _hash(array):
     return hash(str(array))
 
-def _remove_id(tpl):
-    seen = set()
-    result = []
-    for b, x in tpl:
-        expr = simplify(b.name)
-        b.simple_name = expr
-        if expr not in seen:
-            seen.add(expr)
-            result.append((b, x))
-    return result
+def hashed_hash_():
+    cache = {}
+    def inner(x):
+        key = _hash(x)
+        if key not in cache:
+            cache[key] = _hash(x)
+        return cache[key]
+    return inner
 
+hashed_hash = hashed_hash_()
+
+def _remove_id(tpl):
+    expr = OrderedDict()
+    redundant = []
+    for b, x in tpl:
+        name = b.name
+        vhash = hashed_hash(x)
+        if name not in expr and vhash not in redundant:
+            expr[name] = b, x
+            redundant.append(vhash)
+    return list(expr.values())
+
+get_valid = compose(_remove_id, _take_finite)
 
 class SymbolicFeatures(Base):
     """Main class.
     """
-    def __init__(self, exponents, operators, remove_identities=True):
+    def __init__(self, exponents, operators):
         self.exponents = exponents
         self.operators = operators
         self._precompute_hash = None
-        self.remove_identities = remove_identities
         self._names = None
 
     def fit(self, x):
@@ -104,18 +125,17 @@ class SymbolicFeatures(Base):
         const = [(ConstantFeature(), ConstantFeature().transform(x))]
         # 1) Get all simple features
         simple = (SimpleFeature(e, index=i) for e, i in product(self.exponents, range(n_features)))
-        simple = _take_finite((s, s.transform(x)) for s in simple)
+        simple = get_valid((s, s.transform(x)) for s in simple)
         # 2) Get all operator features
         operator = (OperatorFeature(s, op, operator_name=op_name) for (s, _), (op_name, op) in product(simple, self.operators.items()))
-        operator = _take_finite((o, o.transform(x)) for o in operator)
+        operator = get_valid((o, o.transform(x)) for o in operator)
         # 3) Get all product features
         combs = chain(product(operator, simple), combinations(simple, 2))
         prod = [ProductFeature(feat1, feat2) for (feat1, _) , (feat2, _) in combs]
-        prod = _take_finite((p, p.transform(x)) for p in prod)
+        prod = get_valid((p, p.transform(x)) for p in prod)
 
         all_ = const + simple + operator + prod
-        if self.remove_identities:
-            all_ = _remove_id(all_)
+        all_ = get_valid(all_)
         feat_cls, features = zip(*[(c, np.array(f)) for c, f in all_])
 
         self._precomputed_features = np.array(list(features)).T  # speed up fit_transform
@@ -133,9 +153,10 @@ class SymbolicFeatures(Base):
 
     @property
     def names(self):
-        """Get all the feature names. If sympy is used to remove identical features, use the simplified name instead. Cached!
+        """Get all the feature names.
         """
         if self._names is None:
-            attr = "simple_name" if self.remove_identities else "name"
-            self._names = [getattr(f, attr) for f in self.feat_cls]
+            self._names = [f.name for f in self.feat_cls]
         return self._names
+
+    name = names

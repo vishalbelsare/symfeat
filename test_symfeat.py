@@ -5,6 +5,7 @@ import symfeat as sf
 
 @pytest.fixture
 def data():
+    np.random.seed(42)
     d = np.random.normal(size=(10, 2))
     d[0, 0] = 0
     return d
@@ -81,3 +82,11 @@ def test_SymbolicFeatures_remove_id(data):
     sym = sf.SymbolicFeatures(exponents, operators).fit(data)
     # const + simple * 2 + products - excluded
     assert len(sym.names) == 1 + 2*3 + 15 - 2
+
+
+def test_SymbolicFeatures_redundant_data():
+    data = np.ones(shape=(10, 10))
+    exponents = [1]
+    operators = {}
+    sym = sf.SymbolicFeatures(exponents, operators).fit(data)
+    assert len(sym.names) == 1
