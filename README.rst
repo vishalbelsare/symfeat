@@ -20,7 +20,7 @@ Features
 --------
 - Builds a features based on all valid rule specified combinations
 - Discards non-finite transformations
-- Optional: remove equivalent expressions
+- Remove equivalent based on expressions or numeric values
 
 
 Installation
