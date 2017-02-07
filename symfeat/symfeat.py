@@ -120,6 +120,7 @@ class SymbolicFeatures(Base):
         self._names = None
 
     def fit(self, x):
+        x = np.asfortranarray(x)
         _, n_features = x.shape
         # 0) Get constant feature
         const = [(ConstantFeature(), ConstantFeature().transform(x))]
