@@ -1,13 +1,7 @@
-symfeat
-=======
-
 [![image](https://travis-ci.org/Ohjeah/symfeat.svg?branch=master)](https://travis-ci.org/Ohjeah/symfeat)
 [![image](https://badge.fury.io/py/symfeat.svg)](https://badge.fury.io/py/symfeat)
 [![image](https://img.shields.io/pypi/pyversions/symfeat.svg)](https://pypi.python.org/pypi/symfeat/)
 [![image](https://zenodo.org/badge/79949716.svg)](https://zenodo.org/badge/latestdoi/79949716)
-
-**symfeat** is a rule based feature engineering library to be used as a
-preprocessor for regression tasks.
 
 It is based on:
 
