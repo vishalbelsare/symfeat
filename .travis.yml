@@ -8,3 +8,5 @@ install:
   - pip install pytest
 script:
   - py.test
+notifications:
+  email: false
