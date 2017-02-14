@@ -8,6 +8,9 @@ from joblib import hash as _hash
 
 
 class Base(object):
+    def __init__(self):
+        self.name_cache = None
+
     def fit(self, x):
         return self
 
@@ -16,7 +19,9 @@ class Base(object):
 
     @property
     def name(self):
-        return str(simplify(self._name))
+        if self.name_cache = None:
+            self.name_cache = str(simplify(self._name))
+        return self.name_cache
 
 
 class ConstantFeature(Base):
@@ -32,6 +37,7 @@ class SimpleFeature(Base):
     """Base to create polynomial features.
     """
     def __init__(self, exponent, index=0):
+        super().__init__()
         if exponent == 0:
             raise ValueError
         self.exponent = exponent
@@ -50,6 +56,7 @@ class SimpleFeature(Base):
 
 class OperatorFeature(Base):
     def __init__(self, feat_cls, operator, operator_name=None):
+        super().__init__()
         self.feat_cls = feat_cls
         self.operator = operator
         self.operator_name = operator_name or str(operator)
@@ -64,6 +71,7 @@ class OperatorFeature(Base):
 
 class ProductFeature(Base):
     def __init__(self, feat_cls1, feat_cls2):
+        super().__init__()
         self.feat_cls1 = feat_cls1
         self.feat_cls2 = feat_cls2
 
