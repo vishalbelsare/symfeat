@@ -19,7 +19,7 @@ class Base(object):
 
     @property
     def name(self):
-        if self.name_cache = None:
+        if self.name_cache == None:
             self.name_cache = str(simplify(self._name))
         return self.name_cache
 
