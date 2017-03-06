@@ -161,8 +161,7 @@ class SymbolicFeatures(Base):
 
     @property
     def names(self):
-        """Get all the feature names.
-        """
+        """Get all the feature names. Only Available after fitting."""
         if self._names is None:
             self._names = [f.name for f in self.feat_cls]
         return self._names
@@ -171,6 +170,9 @@ class SymbolicFeatures(Base):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state["_precomputed_features"]
+        try:
+            del state["_precomputed_features"]
+        except KeyError:
+            pass
         state["_precompute_hash"] = None
         return state

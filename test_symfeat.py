@@ -96,5 +96,7 @@ def test_SymbolicFeatures_redundant_data():
 def test_SymbolicFeatures_pickle(data):
     exponents = [1]
     operators = {}
-    sym = sf.SymbolicFeatures(exponents, operators).fit(data)
+    sym = sf.SymbolicFeatures(exponents, operators)
+    assert pickle.loads(pickle.dumps(sym)).__dict__ == sym.__dict__
+    sym.fit(data)
     assert pickle.loads(pickle.dumps(sym)).names == sym.names
