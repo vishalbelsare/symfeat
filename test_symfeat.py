@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import pickle
 
 import symfeat as sf
 
@@ -90,3 +91,10 @@ def test_SymbolicFeatures_redundant_data():
     operators = {}
     sym = sf.SymbolicFeatures(exponents, operators).fit(data)
     assert len(sym.names) == 1
+
+
+def test_SymbolicFeatures_pickle(data):
+    exponents = [1]
+    operators = {}
+    sym = sf.SymbolicFeatures(exponents, operators).fit(data)
+    assert pickle.loads(pickle.dumps(sym)).names == sym.names

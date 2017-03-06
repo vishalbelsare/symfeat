@@ -119,8 +119,7 @@ def _remove_id(tpl):
 get_valid = compose(_remove_id, _take_finite)
 
 class SymbolicFeatures(Base):
-    """Main class.
-    """
+    """Main class"""
     def __init__(self, exponents, operators):
         self.exponents = exponents
         self.operators = operators
@@ -169,3 +168,9 @@ class SymbolicFeatures(Base):
         return self._names
 
     name = names
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["_precomputed_features"]
+        state["_precompute_hash"] = None
+        return state
