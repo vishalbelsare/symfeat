@@ -120,9 +120,10 @@ get_valid = compose(_remove_id, _take_finite)
 
 class SymbolicFeatures(Base):
     """Main class"""
-    def __init__(self, exponents, operators):
+    def __init__(self, exponents, operators, const=True):
         self.exponents = exponents
         self.operators = operators
+        self.const = const
         self._precompute_hash = None
         self._names = None
 
@@ -130,7 +131,7 @@ class SymbolicFeatures(Base):
         x = np.asfortranarray(x)
         _, n_features = x.shape
         # 0) Get constant feature
-        const = [(ConstantFeature(), ConstantFeature().transform(x))]
+        const = [(ConstantFeature(), ConstantFeature().transform(x))] if self.const else []
         # 1) Get all simple features
         simple = (SimpleFeature(e, index=i) for e, i in product(self.exponents, range(n_features)))
         simple = get_valid((s, s.transform(x)) for s in simple)

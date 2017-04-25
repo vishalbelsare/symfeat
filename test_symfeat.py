@@ -93,6 +93,14 @@ def test_SymbolicFeatures_redundant_data():
     assert len(sym.names) == 1
 
 
+def test_SymbolicFeatures_no_const():
+    data = np.ones(shape=(10, 10))
+    exponents = [1]
+    operators = {}
+    sym = sf.SymbolicFeatures(exponents, operators, const=False).fit(data)
+    assert sym.names[0] == "x_0"
+
+
 def test_SymbolicFeatures_pickle(data):
     exponents = [1]
     operators = {}
