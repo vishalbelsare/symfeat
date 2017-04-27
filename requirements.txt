@@ -2,4 +2,4 @@ numpy
 sympy
 toolz
 joblib
-scikit-learn
+scikit-learn[alldeps]
