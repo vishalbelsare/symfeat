@@ -122,7 +122,7 @@ class SymbolicFeatures(Base):
         self._precompute_hash = None
         self._names = None
 
-    def fit(self, x):
+    def fit(self, x, y=None):
         x = np.asfortranarray(x)
         _, n_features = x.shape
         # 0) Get constant feature
