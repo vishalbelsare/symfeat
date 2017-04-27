@@ -2,20 +2,15 @@ from itertools import product, chain, combinations
 from collections import OrderedDict
 
 import numpy as np
+from sklearn.base import TransformerMixin, BaseEstimator
 from sympy import simplify
 from toolz import compose
 from joblib import hash as _hash
 
 
-class Base(object):
+class Base(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.name_cache = None
-
-    def fit(self, x):
-        return self
-
-    def fit_transform(self, x):
-        return self.fit(x).transform(x)
 
     @property
     def name(self):
